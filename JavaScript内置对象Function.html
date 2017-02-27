@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<scritpt>
+		定义Function有三种方法：
+			1、function a(){};//函数表达式，有变量提升
+			2、var a = function(){};//对象字面量，无变量提升
+			3、var a = new function(){};//不常用
+
+		函数的变量名是指向一个函数对象的指针
+
+		function f1(){a,b};
+		f1.name;//f1
+		f1.length;//2 注意：f1.length是形参的个数，而arguments.length是实参的个数，即实际传入的参数的个数
+
+
+
+		函数内部值得传递
+		var a = {name : '123'};
+		function f1(o){
+			o.name = '234';
+		}
+		f1(a);
+		a.name;//'234'
+
+		function f2(o){
+			o = '234';
+		}
+		f2(a);
+		a;//'{name : '123'}'
+
+		产生这样的原因是函数内部存在一个赋值操作：o = a;
+		当改变对象的属性时相当于：
+			var o = a;
+			o.name = '234';
+
+		当重新改写对象时相当于：
+			var o = a;
+			o  = '234';
+		这时，o就指向了另外一个对象（变量名相当于一个指针）
+
+
+		arguments.callee是指向原函数
+	</scritpt>
+</body>
+</html>
