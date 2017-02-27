@@ -1,0 +1,42 @@
+JavaScript包装对象Number.html
+
+var n = new Number(1);
+typeof n // "object"
+
+Number(true) // 1
+
+Number对象的属性：
+
+		Number.POSITIVE_INFINITY：正的无限，指向Infinity。
+		Number.NEGATIVE_INFINITY：负的无限，指向-Infinity。
+		Number.NaN：表示非数值，指向NaN。
+		Number.MAX_VALUE：表示最大的正数，相应的，最小的负数为-Number.MAX_VALUE。
+		Number.MIN_VALUE：表示最小的正数（即最接近0的正数，在64位浮点数体系中为5e-324），相应的，最接近0的负数为-Number.MIN_VALUE。
+		Number.MAX_SAFE_INTEGER：表示能够精确表示的最大整数，即9007199254740991。
+		Number.MIN_SAFE_INTEGER：表示能够精确表示的最小整数，即-9007199254740991。
+
+Number.prototype.toString()
+	返回一个值得字符串形式，可以接受参数，即基数
+
+	(10).toString(2) // "1010"
+	(10).toString(8) // "12"
+	(10).toString(16) // "a"
+
+	这里使用()是因为，如果直接10.toString（），JavaScript会把.认为是小数点
+
+
+Number.prototype.toFixed()
+	toFixed方法的参数为指定的小数位数，有效范围为0到20，超出这个范围将抛出RangeError错误
+
+	(10).toFixed(2) // "10.00"
+	10.005.toFixed(2) // "10.01"
+
+
+Number.prototype.toExponential()
+
+	(10).toExponential(1) // "1.0e+1"
+	(10).toExponential(2) // "1.00e+1"
+
+
+Number.prototype.toPrecision()
+	toPrecision方法用于将一个数转为指定位数的有效数字。

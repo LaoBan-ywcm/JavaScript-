@@ -1,5 +1,3 @@
-JavaScript包装对象Boolean
-
 所谓“包装对象”，就是分别与数值、字符串、布尔值相对应的Number、String、Boolean三个原生对象。这三个原生对象可以把原始类型的值变成（包装成）对象。
 
 JavaScript设计包装对象的最大目的，首先是使得JavaScript的“对象”涵盖所有的值。其次，使得原始类型的值可以方便地调用特定方法。
@@ -8,3 +6,20 @@ JavaScript设计包装对象的最大目的，首先是使得JavaScript的“对
 	
 	typeof Number(123) //number
 	typeof new Number(123) //object
+
+
+valueOf()
+	返回包装对象实例对应的原始类型的值
+
+	new Number(123).valueOf()  // 123
+	new String("abc").valueOf() // "abc"
+	new Boolean("true").valueOf() // true
+
+toString()
+	返回实例对应的字符串形式
+
+	new Number(123).toString() // "123"
+	new String("abc").toString() // "abc"
+	new Boolean("true").toString() // "true"
+
+原始类型的值，可以自动当作对象调用，即调用各种对象的方法和参数。这时，JavaScript引擎会自动将原始类型的值转为包装对象，在使用后立刻销毁。
