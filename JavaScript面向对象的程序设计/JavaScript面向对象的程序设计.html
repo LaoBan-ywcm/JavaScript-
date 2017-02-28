@@ -1,0 +1,201 @@
+JavaScript面向对象的程序设计-创建对象
+
+利用构造函数和原型来创建对象
+
+构造函数
+	function Person(){
+	    this.age = 30;
+	}
+	var person1 = new Person();
+	console.log(person1.age);//30
+
+注意：首字母要大写（构造函数）
+
+instanceof操作符可以用来鉴别对象的类型
+	function Person(){
+		//
+	}
+
+	var person1 = new Person();
+	console.log(person1 instanceof Person);//true
+
+constructor构造函数属性
+	function Person(){
+	    //
+	}
+	var person1 = new Person;
+	console.log(person1.constructor === Person);//true    
+	console.log(person1.__proto__.constructor === Person);//true
+
+使用构造函数的优点：所有同一个构造函数的实例，有同样的属性和方法
+			  缺点：使用构造函数的主要问题是每个方法都要在每个实例上重新创建一遍。
+	      解决办法：把方法定义在外面
+
+	function Person(name){
+	    this.name = name;
+	    this.sayName = sayName;
+	}
+	function sayName(){
+	    console.log(this.name);
+	}
+	var person1 = new Person('bai');
+	var person2 = new Person('hu');
+	console.log(person1.sayName === person2.sayName);//true
+
+	缺点：如果一个对象要用很多方法，就要在全局变量中定义多个方法，污染全局空间
+
+
+
+
+最好的解决办法就是使用原型
+
+实例的_proto_与构造函数没有关系，实例的_proto_与构造函数的prototype指向同一对象
+
+isPrototypeOf():可以检测是否为实例对象和原型对象
+	function Foo(){};
+	var f1 = new Foo;
+	console.log(f1.__proto__ === Foo.prototype);//true
+	console.log(Foo.prototype.isPrototypeOf(f1));//true
+
+Object.getPrototypeOf()方法，该方法返回实例对象对应的原型对象
+	function Foo(){};
+	var f1 = new Foo;
+	console.log(Object.getPrototypeOf(f1) === Foo.prototype);//true
+
+
+hasOwnProperty():可以确定该属性是自有属性还是继承属性
+
+	function Person(name){
+	    this.name = name;
+	}
+	Person.prototype.sayName = function(){
+	    console.log(this.name);
+	}
+	var person1 = new Person('bai');
+	var person2 = new Person('hu');
+
+	person1.sayName();//'bai'
+
+注意：可以在原型对象上存储其他类型的数据，但在存储引用值时需要注意。因为这些引用值会被多个实例共享，一个实例能够改变另一个实例的值
+
+	function Person(name){
+	    this.name = name;
+	}
+	Person.prototype.sayName = function(){
+	    console.log(this.name);
+	}
+	Person.prototype.favoraties = [];
+
+	var person1 = new Person('bai');
+	var person2 = new Person('hu');
+
+	person1.favoraties.push('pizza');
+	person2.favoraties.push('quinoa');
+	console.log(person1.favoraties);//["pizza", "quinoa"]
+	console.log(person2.favoraties);//["pizza", "quinoa"]
+
+
+当一个函数被创建时，该原型对象的constructor属性自动创建，并指向该函数。当使用对象字面形式改写原型对象Person.prototype时，需要在改写原型对象时手动重置其constructor属性
+
+	function Person(name){
+	    this.name = name;
+	}
+	Person.prototype = {
+	    constructor: Person,
+	    sayName: function(){
+	        console.log(this.name);
+	    },
+	    toString : function(){
+	        return '[person ' + this.name + ']'
+	    }
+	};
+
+	var person1 = new Person('bai');
+
+	console.log(person1 instanceof Person);//true
+	console.log(person1.constructor === Person);//true
+	console.log(person1.constructor === Object);//false
+
+
+推荐的使用面向对象的形式：组合使用构造函数模式和原型模式是创建自定义类型的最常见方式。构造函数模式用于定义实例属性，而原型模式用于定义方法和共享的属性，这种组合模式还支持向构造函数传递参数。实例对象都有自己的一份实例属性的副本，同时又共享对方法的引用，最大限度地节省了内存。该模式是目前使用最广泛、认同度最高的一种创建自定义对象的模式
+
+	function Person(name,age,job){
+	    this.name = name;
+	    this.age = age;
+	    this.job = job;
+	    this.friends = ["shelby","Court"];
+	}
+	Person.prototype = {
+	    constructor: Person,
+	    sayName : function(){
+	        console.log(this.name);
+	    }    
+	}
+	var person1 = new Person("bai",29,"Software Engineer");
+	var person2 = new Person("hu",25,"Software Engineer");
+	person1.friends.push("Van");
+	alert(person1.friends);// ["shelby","Court","Van"];
+	alert(person2.friends);// ["shelby","Court"];
+	alert(person1.friends === person2.friends);//false
+	alert(person1.sayName === person2.sayName);//true
+
+
+继承
+javascript使用原型链作为实现继承的主要方法，实现的本质是重写原型对象，代之以一个新类型的实例
+	function Super(){
+	    this.value = true;
+	}
+	Super.prototype.getValue = function(){
+	    return this.value;
+	};
+	function Sub(){}
+	//Sub继承了Super
+	Sub.prototype = new Super();
+	Sub.prototype.constructor = Sub;
+
+	var instance = new Sub();
+	console.log(instance.getValue());//true
+
+原型式继承
+	原型式继承借助原型可以基于已有的对象创建新对象，同时还不必因此创建自定义类型。从本质上讲，object()对传入其中的对象执行了一次浅复制
+
+注意：使用原型式继承和原型链继承有个很大的区别：原型式继承中父类型的实例对象不再作为子类型的原型对象，并且子类型可以继承父类原型上的属性，但是不能继承父类实例上的属性
+
+	1、原型链式继承
+		function Super(){
+		    this.value = 1;
+		}
+		Super.prototype.value = 0;
+		function Sub(){};
+		//将父类型的实例对象作为子类型的原型对象
+		Sub.prototype = new Super();//////////////////////////
+		Sub.prototype.constructor = Sub;
+
+		//创建子类型的实例对象
+		var instance = new Sub;
+		console.log(instance.value);//1
+		//这里继承了父类实例中的属性
+
+
+	2、原型式继承
+		function Super(){
+		    this.value = 1;
+		}
+		Super.prototype.value = 0;
+		function Sub(){};
+
+		Sub.prototype = Object.create(Super.prototype);///////////////////
+		Sub.prototype.constructor = Sub;
+
+		//创建子类型的实例对象
+		var instance = new Sub;
+		console.log(instance.value);//0
+		//这里继承的是父类原型链上的属性
+
+	上面的Object.create函数一行代码Sub.prototype = Object.create(Super.prototype)可以分解为
+
+		function F(){};
+		F.prototype = Super.prototype;
+		Sub.prototype = new F();
+
+	由上面代码看出，子类的原型对象是临时类F的实例对象，而临时类F的原型对象又指向父类的原型对象；所以，实际上，子类可以继承父类的原型上的属性，但不可以继承父类的实例上的属性
