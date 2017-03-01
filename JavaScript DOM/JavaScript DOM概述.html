@@ -1,0 +1,141 @@
+JavaScript DOM概述
+
+7中节点类型
+	Document：整个文档树的顶层节点
+	DocumentType：doctype标签（比如<!DOCTYPE html>）
+	Element：网页的各种HTML标签（比如<body>、<a>等）
+	Attribute：网页元素的属性（比如class="right"）
+	Text：标签之间或标签包含的文本
+	Comment：注释
+	DocumentFragment：文档的片段
+
+	firstChild、lastChild、nextSibling、previousSibling
+
+	node.name、node.type
+
+	类型					nodeName				nodeType
+	ELEMENT_NODE			大写的HTML元素名			1
+	ATTRIBUTE_NODE			等同于Attr.name				2
+	TEXT_NODE				#text						3
+	COMMENT_NODE			#comment					8
+	DOCUMENT_NODE			#document					9
+	DOCUMENT_FRAGMENT_NODE	#document-fragment			11
+	DOCUMENT_TYPE_NODE		等同于DocumentType.name		10
+
+	通常使用nodeType确定某个节点的类型
+
+	1、Node.nodeValue
+		返回一个字符串，表示当前节点本身的文本值，该属性可读写。
+
+		注意：只有Test节点、Comment节点、XML文档的CDATA节点有文本值，才可以使用nodeValue设置或者获取值，其他节点都返回null，无法使用
+
+	2、Node.textContent
+		返回当前节点和后代节点的所有文本内容
+		该方法可读可写，当写时会替换节点的所有内容（包括后代所有节点），有个好处，会解析HTML标签
+
+	3、Node.baseURI
+		返回一个字符串，表示当前页面的绝对路径，不同的节点都可以调用这个属性
+
+	4、Node.ownerDocument
+		该属性会返回当前节点所在的顶层文档对象，即document对象
+
+	5、Node.nextSibling
+		注意:如果当前节点后面有空格，会返回这个空格
+
+	6、Node.previousSibling
+
+	7、Node.parentNode
+		返回当前节点的父节点，父节点有三种类型：element节点、document节点、documentfragment节点
+
+	8、Node.parentElement
+		返回当前节点的父element节点
+
+	9、Node.childNodes
+		返回NodeList集合，是一个动态集合，不但会返回element节点，还会返回Text节点、Comment节点
+
+	10、Node.firstChild，Node.lastChild
+
+	11、Node.appendChild()
+		接受一个节点对象作为参数，将其作为最后一个子节点，插入到DOM中
+		注意：如果参数节点已经存在于DOM中，则将它移除，添加到现在的位置
+
+	12、Node.hasChildNodes()
+		返回一个布尔值，表示当前节点是否有子节点
+
+	13、Node.cloneNode()
+		会克隆一个节点，接受一个参数，用于是否克隆子节点
+		注意：会克隆所有属性，除了addEventListener方法和'on'属性
+
+	14、Node.insertBefore()
+		将某个节点插入到当前节点的某个位置，接受两个参数，第一个参数是要插入的节点，第二个参数是当前节点的一个子节点，插入到这个子节点的前面
+
+	15、Node.removeChild()
+		接受一个子节点参数，从DOM中移除这个子节点
+		注意：参数必须得是当前节点的子节点
+
+	16、Node.replaceChild()
+		接受两个参数，第一个参数是要替换的新节点，第二个参数是要被替换的节点
+
+	17、Node.contains()
+		接受一个节点为参数，返回一个布尔值，表示是否为当前节点的后代节点
+
+	18、Node.isEqualNode()
+		返回一个布尔值，用于检查两个节点是否相等，所谓相等，是指的两个节点的类型相同、属性相同、子节点相同
+
+	19、Node.normalize()
+		normailize方法用于清理当前节点内部的所有Text节点。它会去除空的文本节点，并且将毗邻的文本节点合并成一个。
+
+
+NodeList对象
+	NodeList实例对象是一个类似数组的对象，它的成员是节点对象。Node.childNodes、document.querySelectorAll()返回的都是NodeList实例对象。
+
+	NodeList返回一般都是动态对象
+	注意：querySelectorAll方法返回的是一个静态集合
+
+	NodeList接口实例对象提供length属性和数字索引，因此可以像数组那样，使用数字索引取出每个节点，但是它本身并不是数组，不能使用pop或push之类数组特有的方法。
+
+	如果要在NodeList实例对象使用数组方法，可以将NodeList实例转为真正的数组。
+	var div_array = Array.prototype.slice.call(div_list);
+	注意：采用上面的方法将NodeList实例转为真正的数组以后，div_array就是一个静态集合了，不再能动态反映DOM的变化。
+
+	NodeList实例对象的item方法，接受一个数字索引作为参数，返回该索引对应的成员。如果取不到成员，或者索引不合法，则返回null。
+
+HTMLCollection对象
+	HTMLCollection实例对象与NodeList实例对象类似，也是节点的集合，返回一个类似数组的对象。document.links、docuement.forms、document.images等属性，返回的都是HTMLCollection实例对象。
+
+	HTMLCollection与NodeList的区别有以下几点。
+
+	（1）HTMLCollection实例对象的成员只能是Element节点，NodeList实例对象的成员可以包含其他节点。
+
+	（2）HTMLCollection实例对象都是动态集合，节点的变化会实时反映在集合中。NodeList实例对象可以是静态集合。
+
+	（3）HTMLCollection实例对象可以用id属性或name属性引用节点元素，NodeList只能使用数字索引引用。
+
+	HTMLCollection实例的item方法，可以根据成员的位置参数（从0开始），返回该成员。如果取不到成员或数字索引不合法，则返回null。
+
+ParentNode接口
+	ParentNode接口用于获取Element子节点。
+
+	1、children
+		children属性返回一个动态的HTMLCollection集合，由当前节点的所有Element子节点组成。
+
+	2、firstElementChild
+		firstElementChild属性返回当前节点的第一个Element子节点，如果不存在任何Element子节点，则返回null。
+
+	3、lastElementChild
+		lastElementChild属性返回当前节点的最后一个Element子节点，如果不存在任何Element子节点，则返回null。
+
+	4、childElementCount
+		childElementCount属性返回当前节点的所有Element子节点的数目。
+
+ChildNode 接口
+	1、remove()
+		remove方法用于移除当前节点。
+
+	2、before()
+		before方法用于在当前节点的前面，插入一个同级节点。如果参数是节点对象，插入DOM的就是该节点对象；如果参数是文本，插入DOM的就是参数对应的文本节点。
+
+	3、after()
+
+	4、replaceWith()
+		replaceWith方法使用参数指定的节点，替换当前节点。如果参数是节点对象，替换当前节点的就是该节点对象；如果参数是文本，替换当前节点的就是参数对应的文本节点。
