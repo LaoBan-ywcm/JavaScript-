@@ -1,0 +1,114 @@
+JavaScript DOM 事件模型.html
+
+EventTarget接口
+	addEventListener：绑定事件的监听函数
+	removeEventListener：移除事件的监听函数
+	dispatchEvent：触发事件
+
+	addEventListener方法接受三个参数。 	
+		type：事件名称，大小写敏感。
+		listener：监听函数。事件发生时，会调用该监听函数。
+		useCapture：布尔值，表示监听函数是否在捕获阶段（capture）触发
+
+
+	removeEventListener方法用来移除addEventListener方法添加的事件监听函数。
+	注意：removeEventListener方法移除的监听函数，必须与对应的addEventListener方法的参数完全一致，而且必须在同一个元素节点，否则无效。
+
+	dispatchEvent方法在当前节点上触发指定事件，从而触发监听函数的执行。该方法返回一个布尔值，只要有一个监听函数调用了Event.preventDefault()，则返回值为false，否则为true。
+
+	para.addEventListener('click', hello, false);
+	var event = new Event('click');
+	para.dispatchEvent(event);
+
+	addEventListener是推荐的指定监听函数的方法。它有如下优点：
+		可以针对同一个事件，添加多个监听函数。
+
+		能够指定在哪个阶段（捕获阶段还是冒泡阶段）触发回监听函数。
+
+		除了DOM节点，还可以部署在window、XMLHttpRequest等对象上面，等于统一了整个JavaScript的监听函数接口。
+
+	事件的代理
+		由于事件会在冒泡阶段向上传播到父节点，因此可以把子节点的监听函数定义在父节点上，由父节点的监听函数统一处理多个子元素的事件。这种方法叫做事件的代理（delegation）。
+
+		var ul = document.querySelector('ul');
+
+		ul.addEventListener('click', function(event) {
+		  if (event.target.tagName.toLowerCase() === 'li') {
+		    // some code
+		  }
+		});
+
+		如果希望事件到某个节点为止，不再传播，可以使用事件对象的stopPropagation方法。
+
+		但是，stopPropagation方法只会阻止当前监听函数的传播，不会阻止<p>节点上的其他click事件的监听函数。如果想要不再触发那些监听函数，可以使用stopImmediatePropagation方法。
+
+		event.bubbles
+			返回一个布尔值，表示当前事件是否会冒泡，只读属性，默认不会冒泡
+
+		event.eventPhase
+			eventPhase属性返回一个整数值，表示事件目前所处的节点。
+			0，事件目前没有发生。
+			1，事件目前处于捕获阶段，即处于从祖先节点向目标节点的传播过程中。该过程是从Window对象到Document节点，再到HTMLHtmlElement节点，直到目标节点的父节点为止。
+			2，事件到达目标节点，即target属性指向的那个节点。
+			3，事件处于冒泡阶段，即处于从目标节点向祖先节点的反向传播过程中。该过程是从父节点一直到Window对象。只有bubbles属性为true时，这个阶段才可能发生。
+
+		event.cancelable
+			cancelable属性返回一个布尔值，表示事件是否可以取消。该属性为只读属性，默认不可取消
+
+		defaultPrevented
+			defaultPrevented属性返回一个布尔值，表示该事件是否调用过preventDefault方法。
+
+		currentTarget
+			currentTarget属性返回事件当前所在的节点，即正在执行的监听函数所绑定的那个节点。作为比较，target属性返回事件发生的节点。如果监听函数在捕获阶段和冒泡阶段触发，那么这两个属性返回的值是不一样的。
+
+		target
+			target属性返回触发事件的那个节点，即事件最初发生的节点。如果监听函数不在该节点触发，那么它与currentTarget属性返回的值是不一样的。
+
+			注意：在IE6—IE8之中，该属性的名字不是target，而是srcElement，
+
+		event.type，event.detail，event.timeStamp，event.isTrusted
+
+		type属性返回一个字符串，表示事件类型，大小写敏感。
+
+		etail属性返回一个数值，表示事件的某种信息。具体含义与事件类型有关，对于鼠标事件，表示鼠标按键在某个位置按下的次数，比如对于dblclick事件，detail属性的值总是2。
+
+		timeStamp属性返回一个毫秒时间戳，表示事件发生的时间。
+
+		isTrusted属性返回一个布尔值，表示该事件是否为真实用户触发。
+
+
+		event.preventDefault()
+			preventDefault方法取消浏览器对当前事件的默认行为，该方法不会阻止事件的进一步传播（stopPropagation方法可用于这个目的）。只要在事件的传播过程中（捕获阶段、目标阶段、冒泡阶段皆可），使用了preventDefault方法，该事件的默认方法就不会执行。
+
+		event.stopPropagation()
+			会阻止事件在DOM中继续传播，防止再触发定义在别的节点上的监听函数，但是不包括在当前节点上新定义的事件监听函数。
+
+		event.stopImmediatePropagation()
+			如果同一个节点对于同一个事件指定了多个监听函数，这些函数会根据添加的顺序依次调用。只要其中有一个监听函数调用了stopImmediatePropagation方法，其他的监听函数就不会再执行了。
+
+自定义事件
+	Event构造函数只能指定事件名，不能在事件上绑定数据。如果需要在触发事件的同时，传入指定的数据，需要使用CustomEvent构造函数生成自定义的事件对象。
+		var myEvent = new CustomEvent("myevent", {
+		  detail: {
+		    foo: "bar"
+		  },
+		  bubbles: true,
+		  cancelable: false
+		});
+
+		el.addEventListener('myevent', function(event) {
+		  console.log('Hello ' + event.detail.foo);
+		});
+
+		el.dispatchEvent(myEvent);
+
+	事件的模拟
+		有时，需要在脚本中模拟触发某种类型的事件，这时就必须使用这种事件的构造函数。
+			function simulateClick() {
+			  var event = new MouseEvent('click', {
+			    'bubbles': true,
+			    'cancelable': true
+			  });
+			  var cb = document.getElementById('checkbox');
+			  cb.dispatchEvent(event);
+			}
